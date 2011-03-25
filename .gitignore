@@ -1,3 +1,5 @@
 .testdata
 *.pyc
 *~
+.testdata
+private_test.sh

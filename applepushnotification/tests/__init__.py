@@ -4,12 +4,30 @@ import os
 import sys
 import unittest
 import doctest
+from random import randint
 
 here = os.path.dirname(__file__)
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+from applepushnotification import *
 
 # The following vars are set by test.py at launch
 pem_file = None
 hex_token = None
+
+class TestAPNS(unittest.TestCase):
+    def create_message(self):
+        global hex_token, pem_file
+        token = hex_token.decode("hex")
+        msg = NotificationMessage(token, u"Test Message", randint(1, 10),
+            u"default", extra = { "q" : randint(10000, 99999) },
+            identifier = randint(10000000, 99999999))
+        return msg
+
+    def create_service(self):
+        global hex_token, pem_file
+        service = NotificationService(certfile = pem_file)
+        return service
 
 def test_suite():
     suite = additional_tests()
@@ -29,7 +47,6 @@ def additional_tests():
     return suite
 
 def main():
-    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
     suite = test_suite()
     runner = unittest.TextTestRunner()
     runner.run(suite)

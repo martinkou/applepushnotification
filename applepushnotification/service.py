@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
+from gevent import monkey; monkey.patch_all()
 import ssl, gevent, time, struct
 from gevent.queue import Queue
-from gevent.socket import *
+from socket import *
 
 try:
 	import json
@@ -74,10 +75,10 @@ class NotificationService(object):
 			s = ssl.wrap_socket(socket(AF_INET, SOCK_STREAM, 0),
 				ssl_version=ssl.PROTOCOL_SSLv3,
 				**self._sslargs)
-			addr = ("gateway.push.apple.com", 2195)
+			addr = ["gateway.push.apple.com", 2195]
 			if self._sandbox:
 				addr[0] = "gateway.sandbox.push.apple.com"
-			s.connect(addr)
+			s.connect_ex(tuple(addr))
 			self._push_connection = s
 			gevent.spawn(self._error_loop)
 
@@ -86,10 +87,10 @@ class NotificationService(object):
 			s = ssl.wrap_socket(socket(AF_INET, SOCK_STREAM, 0),
 				ssl_version = ssl.PROTOCOL_SSLv3,
 				**self._sslargs)
-			addr = ("feedback.push.apple.com", 2196)
+			addr = ["feedback.push.apple.com", 2196]
 			if self._sandbox:
 				addr[0] = "feedback.sandbox.push.apple.com"
-			s.connect(addr)
+			s.connect_ex(tuple(addr))
 			self._feedback_connection = s
 
 	def _send_loop(self):
@@ -148,13 +149,15 @@ class NotificationService(object):
 		self._send_queue.put(obj)
 
 	def get_error(self, block = True, timeout = None):
-		"""Gets the next error message.
+		"""
+		Gets the next error message.
 		
 		Each error message is a 2-tuple of (status, identifier)."""
 		return self._error_queue.get(block = block, timeout = timeout)
 
 	def get_feedback(self, block = True, timeout = None):
-		"""Gets the next feedback message.
+		"""
+		Gets the next feedback message.
 
 		Each feedback message is a 2-tuple of (timestamp, device_token)."""
 		return self._feedback_queue.get(block = block, timeout = timeout)
@@ -164,9 +167,24 @@ class NotificationService(object):
 		if self._send_greenlet is None:
 			gevent.spawn(self._send_loop)
 
-	def stop(self):
-		"""Stop sending messages, close connection."""
+	def stop(self, timeout = 10.0):
+		"""
+		Send all pending messages, close connection.
+		Returns True if no message left to sent. False if dirty.
+		
+		- timeout: seconds to wait for sending remaining messages. disconnect
+		  immedately if None.
+		"""
+		if timeout is not None:
+			time_spent = 0.0
+			while self._send_queue.qsize() > 0:
+				gevent.sleep(0.5)
+				time_spent += 0.5
+				if time_spent > timeout:
+					break
+
 		if self._send_greenlet is not None:
 			gevent.kill(self._send_greenlet)
 		if self._error_greenlet is not None:
 			gevent.kill(self._error_greenlet)
+		return self._send_queue.qsize() < 1
