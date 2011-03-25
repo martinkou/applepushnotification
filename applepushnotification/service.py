@@ -50,8 +50,9 @@ class NotificationMessage(object):
 		encoded = json.dumps(data)
 		length = len(encoded)
 
-		return struct.pack("!bH32sH%(length)ds" % { "length" : length },
-				0, 32, self.token, length, encoded)
+		return struct.pack("!bIIH32sH%(length)ds" % { "length" : length },
+			1, self.identifier, self.expiry,
+			32, self.token, length, encoded)
 
 class NotificationService(object):
 	def __init__(self, sandbox = True, **kwargs):
