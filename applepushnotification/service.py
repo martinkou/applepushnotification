@@ -23,11 +23,13 @@ class NotificationMessage(object):
 	extra - dictionary of extra parameters
 	"""
 	def __init__(self, token, alert, badge = None, sound = None, identifier = 0,
-			expiry = long(time.time()) + 365 * 86400, extra = None):
+			expiry = None, extra = None):
 		if len(token) != 32:
 			raise ValueError, u"Token must be a 32-byte binary string."
 		if not isinstance(alert, (str, unicode, dict)):
 			raise ValueError, u"Alert message must be a string or a dictionary."
+		if expiry is None:
+			expiry = long(time.time() + 365 * 86400)
 
 		self.token = token
 		self.alert = alert
