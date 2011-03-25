@@ -1,0 +1,16 @@
+Apple Push Notification Service connector for Python
+==
+
+An APNS connector which just works. The following items are supported:
+
+ - Extended APNS message (most Python APNS libraries only support basic format)
+ - Expiry date on notifications
+ - Custom data fields
+ - Unicode messages
+
+The biggest differentiator between this connector and other libraries is that
+the programmer doesn't have to manage individual APNS connections or wrappers.
+This connector will reconnect to send notifications automatically, and maintain
+connections opportunistically for good performance.
+
+Depends on gevent and expects coroutine I/O style.
