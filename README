@@ -7,6 +7,8 @@ An APNS connector which just works. The following items are supported:
  - Expiry date on notifications
  - Custom data fields
  - Unicode messages
+ - Error reporting
+ - Automatic feedback handling
 
 The biggest differentiator between this connector and other libraries is that
 the programmer doesn't have to manage individual APNS connections or wrappers.
