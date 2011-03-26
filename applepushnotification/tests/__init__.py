@@ -16,10 +16,12 @@ pem_file = None
 hex_token = None
 
 class TestAPNS(unittest.TestCase):
-    def create_message(self):
+    def create_message(self, text = None):
         global hex_token, pem_file
         token = hex_token.decode("hex")
-        msg = NotificationMessage(token, u"Test Message", randint(1, 10),
+        if text is None:
+            text = u"Test Message %d" % (randint(10000, 99999),)
+        msg = NotificationMessage(token, text, randint(1, 10),
             u"default", extra = { "q" : randint(10000, 99999) },
             identifier = randint(10000000, 99999999))
         return msg
