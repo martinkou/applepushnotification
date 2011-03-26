@@ -3,3 +3,6 @@
 *~
 .testdata
 private_test.sh
+build
+dist
+*.egg-info
