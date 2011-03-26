@@ -1,5 +1,5 @@
 Apple Push Notification Service connector for Python
-==
+================================================================================
 
 An APNS connector which just works. The following items are supported:
 
@@ -16,3 +16,5 @@ This connector will reconnect to send notifications automatically, and maintain
 connections opportunistically for good performance.
 
 Depends on gevent and expects coroutine I/O style.
+
+* This library and its author are not affiliated with Apple Inc.

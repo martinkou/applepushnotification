@@ -15,4 +15,4 @@ class TestDisconnect(TestAPNS):
         service._push_connection.close()
         service.send(self.create_message())
         self.assertTrue(service._send_greenlet is not None)
-        retval = service.stop()
+        self.assertTrue(service.stop())
