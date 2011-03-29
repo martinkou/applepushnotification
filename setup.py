@@ -6,7 +6,7 @@
 from setuptools import setup, find_packages
 
 setup(name = "applepushnotification",
-		version="0.1",
+		version="0.1.1",
 		packages=["applepushnotification"],
 		author = "Kou Man Tong",
 		author_email = "martinkou@tixxme.com",

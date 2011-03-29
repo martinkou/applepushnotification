@@ -18,3 +18,39 @@ connections opportunistically for good performance.
 Depends on gevent and expects coroutine I/O style.
 
 * This library and its author are not affiliated with Apple Inc.
+
+
+Usage Example
+================================================================================
+
+This connector is expected to be used in a Python network service which uses
+gevent for I/O. For example, a gevent.pywsgi web server running Pylons. In this
+case the connector will open a few greenlets for sending push notifications and
+receiving replies from APNS servers.
+
+If you're testing the library from command line or from a stand-alone script,
+you'll need to make some way to let gevent switch to the library's greenlets
+during message send. The recommended way to do this is to call wait_send():
+
+>>> from applepushnotification import *
+>>> service = NotificationService(certfile="<cert/key bundle in PEM format>")
+>>> service.start()
+>>> token = "<hex encoded device token from Apple>".decode("hex")
+>>> message = NotificationMessage(token, u"Hello World!")
+>>> service.send(message)
+>>> service.wait_send()
+>>> ... send a few more messages here ...
+>>> service.stop()      # this implies a wait_send() as well
+
+Assume the PEM certificate and the device token are set correctly, and that
+you have the corresponding iOS app installed on the device, you should see a
+Hello World message within a few seconds.
+
+wait_send() is generally not needed when you're using the library in a gevent
+based network service. The reason being that your network service would normally
+spend time waiting for network activity, during which gevent's scheduler will
+switch to scheduled greenlets such that the connector can send messages out in
+the background.
+
+If you're not familiar with coroutine I/O and gevent, please refer to gevent's
+documentation at http://www.gevent.org/

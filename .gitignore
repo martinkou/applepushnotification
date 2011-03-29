@@ -6,3 +6,4 @@ private_test.sh
 build
 dist
 *.egg-info
+.*.swp
